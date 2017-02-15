@@ -291,6 +291,7 @@ services:
     tty: true
     labels:
       io.rancher.container.pull_image: always
+      io.rancher.scheduler.affinity:host_label: capricorn=1
 
   docker-images-updater:
     image: phusion/baseimage
