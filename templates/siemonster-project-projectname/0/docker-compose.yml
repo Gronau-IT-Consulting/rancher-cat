@@ -12,7 +12,6 @@ services:
     labels:
       io.rancher.container.pull_image: always
       io.rancher.container.hostname_override: container_name
-      io.rancher.scheduler.affinity:host_label: kraken=1
 
   msa:
     build: https://github.com/siemonster/project-free.git#master:containers/msa
@@ -25,7 +24,6 @@ services:
     labels:
       io.rancher.container.pull_image: always
       io.rancher.sidekicks: msa-volume
-      io.rancher.scheduler.affinity:host_label: kraken=1
 
   msa-volume:
     build: https://github.com/siemonster/project-free.git#master:containers/msa-volume
@@ -37,7 +35,6 @@ services:
     labels:
       io.rancher.container.pull_image: always
       io.rancher.container.start_once: 'true'
-      io.rancher.scheduler.affinity:host_label: kraken=1
   
   admin:
     image: ikuturso/msa-free
@@ -49,7 +46,6 @@ services:
     labels:
       io.rancher.container.pull_image: always
       io.rancher.container.hostname_override: container_name
-      io.rancher.scheduler.affinity:host_label: kraken=1
 
   heaven-backend:
     image: extremeprog/heaven
@@ -291,7 +287,6 @@ services:
     tty: true
     labels:
       io.rancher.container.pull_image: always
-      io.rancher.scheduler.affinity:host_label: capricorn=1
 
   docker-images-updater:
     image: phusion/baseimage
@@ -304,7 +299,6 @@ services:
       io.rancher.container.start_once: 'true'
       io.rancher.container.pull_image: always
       io.rancher.scheduler.global: 'true'
-      io.rancher.scheduler.affinity:host_label: capricorn=1
 
   '411':
     labels:
@@ -690,6 +684,7 @@ services:
       io.rancher.container.pull_image: always
       io.rancher.container.hostname_override: container_name
       io.rancher.scheduler.affinity:host_label: proteus=1
+      io.rancher.sidekicks: logstash-volume
     tty: true
     stdin_open: true
     ports:
@@ -700,6 +695,8 @@ services:
     - 3526:3526
     - 3527:3527
     - 3528:3528
+    volumes_from:
+    - logstash-volume
     volumes:
     - /opt/containers/${SITE_DNAME}/var/log:/var/log
     - /opt/containers/${SITE_DNAME}/var/ossec/data:/var/ossec/data
@@ -712,6 +709,18 @@ services:
     image: ikuturso/logstash:ssl
     command: logstash -f /config-dir
 
+  logstash-volume:
+    labels:
+      io.rancher.container.pull_image: always
+      io.rancher.container.hostname_override: container_name
+    tty: true
+    stdin_open: true
+    volumes:
+    - /config-dir
+    - /etc/logstash
+    build: https://github.com/siemonster/project-free.git#master:containers/logstash
+    command: /bin/bash
+    
   syslog-ng:
     labels:
       io.rancher.container.pull_image: always
